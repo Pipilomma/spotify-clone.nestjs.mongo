@@ -6,7 +6,6 @@ import { User, UserDocument } from "src/user/schemas/user.schema";
 import { UserService } from "src/user/user.service";
 import * as bcrypt from 'bcrypt';
 import { InjectModel } from "@nestjs/mongoose";
-import { throttleTime } from "rxjs";
 
 
 @Injectable()
@@ -27,9 +26,6 @@ export class AuthService {
             const { password_hash, ...result } = user;
             return result;
         }
-
-        console.log(await bcrypt.compare(user.password_hash, password))
-        console.log(user)
 
         return null;
     }
