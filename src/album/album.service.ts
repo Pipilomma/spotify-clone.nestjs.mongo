@@ -4,15 +4,12 @@ import { Album, AlbumDocument } from "./schemas/album.schema";
 import { Connection, Model, ObjectId, Types } from "mongoose";
 import { CreateAlbumDto } from "./dto/create-album.dto";
 import { FileService, FileType } from "src/file/file.service";
-import { Track, TrackDocument } from "src/track/schemas/track.schema";
 
 @Injectable()
 export class AlbumService {
     private readonly logger = new Logger(AlbumService.name);
 
     constructor(@InjectModel(Album.name) private albumModel: Model<AlbumDocument>,
-                @InjectConnection()
-                private readonly connection: Connection,
                 private fileService: FileService) {}
 
     async create(dto: CreateAlbumDto, cover): Promise<Album> {

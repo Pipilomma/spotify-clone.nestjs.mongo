@@ -1,15 +1,21 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Logger } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Logger, UseGuards } from "@nestjs/common";
 import { TrackService } from "./track.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import * as mongoose from "mongoose";
 import { CreateCommentDto } from "./dto/create-comment.dto";
 import { FileFieldsInterceptor } from "@nestjs/platform-express";
 import { AddTrackDto } from "./dto/add-track.dto";
+import { JwtAuthGuard } from "src/auth/guards/auth-jwt.guard";
+import { RolesGuard } from "src/auth/guards/auth-role.guard";
+import { Role } from "src/common/enums/role.enum";
+import { Roles } from "src/auth/decorators/roles.decorator";
 
 @Controller("/tracks")
 export class TrackController {
     constructor(private trackService: TrackService) {}
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN, Role.ARTIST)
     @Post()
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'audio', maxCount: 1 },
@@ -36,6 +42,8 @@ export class TrackController {
         return this.trackService.getAll(limit, offset);
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     @Delete(":id")
     delete(@Param("id") id: mongoose.Types.ObjectId) {
         return this.trackService.delete(id);
@@ -46,11 +54,14 @@ export class TrackController {
         return this.trackService.addComment(dto);
     }
 
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @Roles(Role.ADMIN)
     @Delete("/comments/:id")
     deleteComment(@Param("id") id: mongoose.Types.ObjectId) {
         return this.trackService.deleteComment(id);
     }
 
+    @UseGuards(JwtAuthGuard)
     @Post("/albums/:id")
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'audio', maxCount: 1 },

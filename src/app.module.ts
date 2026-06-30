@@ -8,6 +8,8 @@ import { LoggerModule } from 'nestjs-pino';
 import * as path from "path";
 import { AlbumModule } from "./album/album.module";
 import dotenv from 'dotenv';
+import { UserModule } from "./user/user.module";
+import { AuthModule } from "./auth/auth.module";
 
 dotenv.config();
 
@@ -18,6 +20,8 @@ const uri = process.env.MONGO_URI || "";
     AlbumModule,
     TrackModule,
     FileModule,
+    UserModule,
+    AuthModule,
     MongooseModule.forRoot(uri),
     ServeStaticModule.forRoot({rootPath: path.resolve(__dirname, "file", "static")}),
     LoggerModule.forRoot({
