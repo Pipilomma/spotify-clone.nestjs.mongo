@@ -136,12 +136,12 @@ export class TrackService {
     }
 
     async listen(id: Types.ObjectId) {
-    const track = await this.trackModel.findByIdAndUpdate(id, { $inc: { listens: 1 }}, { new: true} );
+        const track = await this.trackModel.findByIdAndUpdate(id, { $inc: { listens: 1 }}, { new: true} );
 
-    if (!track) {
-        throw new NotFoundException("track not found");
+        if (!track) {
+            throw new NotFoundException("track not found");
+        }
+
+        return track;
     }
-
-    return track;
-}
 }
