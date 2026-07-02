@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Logger, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Request, UseGuards } from "@nestjs/common";
 import { AlbumService } from "./album.service";
 import { CreateAlbumDto } from "./dto/create-album.dto";
 import * as mongoose from "mongoose";
@@ -18,9 +18,9 @@ export class AlbumController {
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'cover', maxCount: 1 },
     ]))
-    create(@Body() createDto: CreateAlbumDto, @UploadedFiles() files){
+    create(@Body() createDto: CreateAlbumDto, @UploadedFiles() files, @Request() req){
         const {cover} = files;
-        return this.albumService.create(createDto, cover[0]);
+        return this.albumService.create(createDto, req.user.id, req.user.username, cover[0]);
     }
 
     @Get("/search")
@@ -41,7 +41,7 @@ export class AlbumController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Delete(":id")
-    delete(@Param("id") id: mongoose.Types.ObjectId) {
-        return this.albumService.delete(id);
+    delete(@Param("id") id: string, @Request() req) {
+        return this.albumService.delete(id, req.user.id);
     }
 }

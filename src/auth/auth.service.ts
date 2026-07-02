@@ -14,8 +14,8 @@ export class AuthService {
                 @InjectModel(User.name) private userModel: Model<UserDocument>
     ) {}
 
-    generateJwtToken = (data: { email: string, role: string }) => {
-        const payload = { email: data.email, role: data.role };
+    generateJwtToken = (data: { id: string, role: string }) => {
+        const payload = { id: data.id, role: data.role };
         return { access_token: this.jwtService.sign(payload) };
     };
 
@@ -31,11 +31,13 @@ export class AuthService {
     }
     
     async login(user: User) {
-        const { password_hash, ...result } = user;
+        const { password_hash, _id, ...result } = user;
+
+        let strID: string = _id.toString();
 
         return {
             ...result,
-            token: this.generateJwtToken({email: result.email, role: result.role}),
+            token: this.generateJwtToken({id: strID, role: result.role}),
         };
     }
 
@@ -62,7 +64,7 @@ export class AuthService {
         }
 
         const token = this.generateJwtToken({
-            email: user.email,
+            id: user._id.toString(),
             role: user.role,
         });
 

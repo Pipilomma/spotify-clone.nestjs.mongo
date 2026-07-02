@@ -6,16 +6,16 @@ import { User, UserSchema } from "src/user/schemas/user.schema";
 import { UserModule } from "src/user/user.module";
 import { PassportModule } from "@nestjs/passport";
 import { JwtModule } from "@nestjs/jwt/dist/jwt.module";
-import { jwtConstants } from "./constants/jwt-constant";
 import { LocalStrategy } from "./strategies/local.strategy";
 import { JwtStrategy } from "./strategies/jwt.stragegy";
+import { jwtSecret } from "./constants/jwt-constant";
 
 @Module({
     imports: [
         UserModule,
         PassportModule,
         JwtModule.register({
-            secret: jwtConstants.secret,
+            secret: jwtSecret,
             signOptions: { expiresIn: '30d' },
         }),
         MongooseModule.forFeature([{name: User.name, schema: UserSchema}])

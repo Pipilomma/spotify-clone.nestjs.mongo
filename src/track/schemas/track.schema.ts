@@ -12,6 +12,9 @@ export class Track {
   artist!: string;
 
   @Prop()
+  owner!: string;
+
+  @Prop()
   text!: string;
 
   @Prop()

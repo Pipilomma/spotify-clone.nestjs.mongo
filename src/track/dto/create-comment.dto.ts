@@ -1,7 +1,7 @@
-import { ObjectId } from "mongoose";
+import { Types } from "mongoose";
 
 export class CreateCommentDto {
-    readonly username!: string;
+    readonly user_id!: string;
     readonly text!: string;
-    readonly trackId!: ObjectId;
+    readonly trackId!: Types.ObjectId;
 }

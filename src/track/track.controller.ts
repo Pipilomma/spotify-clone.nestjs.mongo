@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Logger, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Request, UseGuards } from "@nestjs/common";
 import { TrackService } from "./track.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import * as mongoose from "mongoose";
@@ -21,10 +21,10 @@ export class TrackController {
         { name: 'audio', maxCount: 1 },
         { name: 'cover', maxCount: 1 },
     ]))
-    create(@Body() createDto: CreateTrackDto, @UploadedFiles() files){
+    create(@Body() createDto: CreateTrackDto, @UploadedFiles() files, @Request() req){
         const {audio, cover} = files;
 
-        return this.trackService.create(createDto, audio[0], cover[0]);
+        return this.trackService.create(createDto, req.user.id, req.user.username, audio[0], cover[0]);
     }
 
     @Get("/search")
@@ -43,10 +43,10 @@ export class TrackController {
     }
 
     @UseGuards(JwtAuthGuard, RolesGuard)
-    @Roles(Role.ADMIN)
+    @Roles(Role.ARTIST, Role.ADMIN)
     @Delete(":id")
-    delete(@Param("id") id: mongoose.Types.ObjectId) {
-        return this.trackService.delete(id);
+    delete(@Param("id") id: mongoose.Types.ObjectId, @Request() req) {
+        return this.trackService.delete(id, req.user.id);
     }
     
     @Post("/comments")
@@ -57,8 +57,8 @@ export class TrackController {
     @UseGuards(JwtAuthGuard, RolesGuard)
     @Roles(Role.ADMIN)
     @Delete("/comments/:id")
-    deleteComment(@Param("id") id: mongoose.Types.ObjectId) {
-        return this.trackService.deleteComment(id);
+    deleteComment(@Param("id") id: mongoose.Types.ObjectId, @Request() req) {
+        return this.trackService.deleteComment(id, req.user.id);
     }
 
     @UseGuards(JwtAuthGuard)
@@ -66,10 +66,10 @@ export class TrackController {
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'audio', maxCount: 1 },
     ]))
-    addTrackToAlbum(@Param("id") id: mongoose.Types.ObjectId, addTrackDto: AddTrackDto, @UploadedFiles() files){
+    addTrackToAlbum(@Param("id") id: mongoose.Types.ObjectId, addTrackDto: AddTrackDto, @Request() req, @UploadedFiles() files){
         const {audio, cover} = files;
 
-        return this.trackService.addTrackToAlbum(id, addTrackDto, audio[0]);
+        return this.trackService.addTrackToAlbum(id, addTrackDto, req.user.id, audio[0]);
     }
 
    @Post("/listen/:id") 

@@ -8,8 +8,6 @@ import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UserService {
-    // private readonly logger = new Logger(UserService.name);
-
     constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
 
     async create(createDto: CreateUserDto): Promise<User> {
@@ -17,13 +15,11 @@ export class UserService {
             throw new BadRequestException("password is undefined");
         }
 
-        let password: string = createDto.password;
-
-        if(password !== createDto.passwordConfirm) {
+        if(createDto.password !== createDto.passwordConfirm) {
             throw new BadRequestException("passwords not match");
         }
 
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await bcrypt.hash(createDto.password, 10);
 
         const user = await this.userModel.create({
             username: createDto.username,
@@ -35,8 +31,8 @@ export class UserService {
         return user;
     }
 
-    async getOne(email: string): Promise<User> {
-        const user = await this.userModel.findOne({email: email});
+    async getOne(id: string): Promise<User> {
+        const user = await this.userModel.findOne({_id: id});
 
         if(!user) {
             throw new NotFoundException("failed to find user");
@@ -47,10 +43,6 @@ export class UserService {
 
     async getAll(limit = 10, offset = 0): Promise<User[]> {
         const users = await this.userModel.find().skip(offset).limit(limit);
-
-        if(!users) {
-            throw new NotFoundException("failed to find user");
-        }
 
         return users;
     }

@@ -8,10 +8,13 @@ export type CommentDocument = HydratedDocument<Comment>;
 @Schema()
 export class Comment {
   @Prop()
-  username!: string;
+  user_id!: string;
 
   @Prop()
   text!: string;
+
+  @Prop()
+  owner!: string;
 
   @Prop({type: mongoose.Schema.Types.ObjectId, ref: "Track"})
   track!: Track;

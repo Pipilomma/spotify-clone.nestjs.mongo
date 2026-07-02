@@ -10,6 +10,9 @@ export class Album {
 
   @Prop()
   artist!: string;
+
+  @Prop()
+  owner!: string;
   
   @Prop()
   cover!: string;
