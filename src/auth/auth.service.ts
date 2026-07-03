@@ -23,21 +23,18 @@ export class AuthService {
         const user = await this.userService.getOneByCond({email: email, password: password});
 
         if (user && await bcrypt.compare(password, user.password_hash)) {
-            const { password_hash, ...result } = user;
-            return result;
+            return user;
         }
 
         return null;
     }
     
     async login(user: User) {
-        const { password_hash, _id, ...result } = user;
-
-        let strID: string = _id.toString();
+        let strID: string = user._id.toString();
 
         return {
-            ...result,
-            token: this.generateJwtToken({id: strID, role: result.role}),
+            user,
+            token: this.generateJwtToken({id: strID, role: user.role}),
         };
     }
 
