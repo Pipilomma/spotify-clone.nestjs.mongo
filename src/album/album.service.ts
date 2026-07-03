@@ -59,7 +59,7 @@ export class AlbumService {
             throw new NotFoundException("album is not exists");
         }
 
-        if (album.owner.toString() !== ownerId) {
+        if (album.owner !== ownerId) {
             throw new ForbiddenException("don't have right to do this");
         }
 

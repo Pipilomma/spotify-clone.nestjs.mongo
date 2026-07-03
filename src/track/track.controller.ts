@@ -67,7 +67,7 @@ export class TrackController {
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'audio', maxCount: 1 },
     ]))
-    addTrackToAlbum(@Param("id") id: mongoose.Types.ObjectId, addTrackDto: AddTrackDto, @Request() req, @UploadedFiles() files){
+    addTrackToAlbum(@Param("id") id: mongoose.Types.ObjectId, @Body() addTrackDto: AddTrackDto, @Request() req, @UploadedFiles() files){
         const {audio, cover} = files;
 
         return this.trackService.addTrackToAlbum(id, addTrackDto, req.user.id, audio[0]);

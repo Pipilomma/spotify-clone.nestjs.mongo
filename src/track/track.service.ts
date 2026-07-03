@@ -128,7 +128,7 @@ export class TrackService {
         }
 
         const auidoPath = this.fileService.createFile(FileToSaveType.AUDIO, audio);
-        const track = await this.trackModel.create({...dto, listens: 0, audio: auidoPath, album: id});
+        const track = await this.trackModel.create({name: dto.name, artist: album.artist, listens: 0, audio: auidoPath, album: id, owner: album.owner.toString()});
 
         if(!track) {
             throw new InternalServerErrorException("failed to create track by album");
