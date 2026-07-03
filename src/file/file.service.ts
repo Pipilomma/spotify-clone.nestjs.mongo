@@ -2,16 +2,11 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import * as path from "path";
 import * as fs from "fs";
 import * as uuid from "uuid";
-
-export enum FileType {
-    AUDIO = "audio",
-    IMAGE = "image"
-}
+import { FileToSaveType } from "src/common/enums/fileType.enum";
 
 @Injectable()
 export class FileService {
-
-    createFile(type: FileType, file): string {
+    createFile(type: FileToSaveType, file): string {
         try {
             const fileExtension = file.originalname.split('.').pop()
             const fileName = uuid.v4() + '.' + fileExtension

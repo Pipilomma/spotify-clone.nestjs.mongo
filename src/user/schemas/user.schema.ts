@@ -14,6 +14,9 @@ export class User {
   email!: string;
 
   @Prop()
+  avatar?: string;
+
+  @Prop()
   password_hash!: string;
 
   @Prop()

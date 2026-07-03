@@ -38,7 +38,7 @@ export class AuthService {
         };
     }
 
-    async register(dto: CreateUserDto) {
+    async register(dto: CreateUserDto, avatar) {
         if (dto.password !== dto.passwordConfirm) {
             throw new BadRequestException("passwords don't match");
         }
@@ -53,8 +53,8 @@ export class AuthService {
             email: dto.email,
             password: dto.password,
             passwordConfirm: dto.passwordConfirm,
-            role: dto.role,
-        });
+            role: dto.role
+        }, avatar);
 
         if (!user?._id) {
             throw new InternalServerErrorException('User creation failed');

@@ -3,7 +3,9 @@ import { InjectModel } from "@nestjs/mongoose";
 import { Album, AlbumDocument } from "./schemas/album.schema";
 import { Model, ObjectId, Types } from "mongoose";
 import { CreateAlbumDto } from "./dto/create-album.dto";
-import { FileService, FileType } from "src/file/file.service";
+import { FileService } from "src/file/file.service";
+import { FileToSaveType } from "../common/enums/fileType.enum"
+
 
 @Injectable()
 export class AlbumService {
@@ -12,7 +14,7 @@ export class AlbumService {
                 private fileService: FileService) {}
 
     async create(dto: CreateAlbumDto, userId: string, artistName: string, cover): Promise<Album> {
-        const coverPath = this.fileService.createFile(FileType.IMAGE, cover);
+        const coverPath = this.fileService.createFile(FileToSaveType.IMAGE, cover);
         const album = await this.albumModel.create({name: dto.name, artist: artistName, owner: userId, cover: coverPath});
 
         return album!;

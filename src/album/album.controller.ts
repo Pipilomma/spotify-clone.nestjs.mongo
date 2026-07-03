@@ -9,10 +9,11 @@ import { Roles } from "src/auth/decorators/roles.decorator";
 import { Role } from "src/common/enums/role.enum";
 
 @Controller("/albums")
+@UseGuards(JwtAuthGuard)
 export class AlbumController {
     constructor(private albumService: AlbumService) {}
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN, Role.ARTIST)
     @Post()
     @UseInterceptors(FileFieldsInterceptor([
@@ -38,7 +39,7 @@ export class AlbumController {
         return this.albumService.getAll(limit, offset);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Delete(":id")
     delete(@Param("id") id: string, @Request() req) {

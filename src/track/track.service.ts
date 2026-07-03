@@ -5,20 +5,25 @@ import { Model, ObjectId, Types } from "mongoose";
 import { Comment, CommentDocument } from "./schemas/comment.schema";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import { CreateCommentDto } from "./dto/create-comment.dto";
-import { FileService, FileType } from "../file/file.service";
+import { FileService } from "../file/file.service";
 import { AddTrackDto } from "./dto/add-track.dto";
 import { Album, AlbumDocument } from "src/album/schemas/album.schema";
+import { ActivityService } from "../activity/activity.service";
+import { ActivityType } from "../common/enums/activeType.enum"
+import { FileToSaveType } from "../common/enums/fileType.enum"
+
 
 @Injectable()
 export class TrackService {
     constructor(@InjectModel(Track.name) private trackModel: Model<TrackDocument>,
                 @InjectModel(Comment.name) private commentModel: Model<CommentDocument>,
                 @InjectModel(Album.name) private albumModel: Model<AlbumDocument>,
-                private fileService: FileService) {}
+                private fileService: FileService,
+                private activityService: ActivityService) {}
 
     async create(dto: CreateTrackDto, userId: string, artistName: string, audio, cover): Promise<Track> {
-        const auidoPath = this.fileService.createFile(FileType.AUDIO, audio);
-        const coverPath = this.fileService.createFile(FileType.IMAGE, cover);
+        const auidoPath = this.fileService.createFile(FileToSaveType.AUDIO, audio);
+        const coverPath = this.fileService.createFile(FileToSaveType.IMAGE, cover);
         const track = await this.trackModel.create({...dto, artist: artistName, owner: userId, listens: 0, audio: auidoPath, cover: coverPath});
 
         return track;
@@ -122,7 +127,7 @@ export class TrackService {
             throw new ForbiddenException("don't have the rights to do this")
         }
 
-        const auidoPath = this.fileService.createFile(FileType.AUDIO, audio);
+        const auidoPath = this.fileService.createFile(FileToSaveType.AUDIO, audio);
         const track = await this.trackModel.create({...dto, listens: 0, audio: auidoPath, album: id});
 
         if(!track) {
@@ -135,12 +140,14 @@ export class TrackService {
         return track;
     }
 
-    async listen(id: Types.ObjectId) {
-        const track = await this.trackModel.findByIdAndUpdate(id, { $inc: { listens: 1 }}, { new: true} );
+    async listen(trackId: Types.ObjectId, userId: string) {
+        const track = await this.trackModel.findByIdAndUpdate(trackId, { $inc: { listens: 1 }}, { new: true} );
 
         if (!track) {
             throw new NotFoundException("track not found");
         }
+
+        await this.activityService.create({userId: userId, type: ActivityType.LISTEN, trackId: trackId.toString()});
 
         return track;
     }

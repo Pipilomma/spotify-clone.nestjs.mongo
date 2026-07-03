@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Request, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Post, Query, UploadedFiles, UseInterceptors, Request, UseGuards, Req } from "@nestjs/common";
 import { TrackService } from "./track.service";
 import { CreateTrackDto } from "./dto/create-track.dto";
 import * as mongoose from "mongoose";
@@ -11,10 +11,11 @@ import { Role } from "src/common/enums/role.enum";
 import { Roles } from "src/auth/decorators/roles.decorator";
 
 @Controller("/tracks")
+@UseGuards(JwtAuthGuard)
 export class TrackController {
     constructor(private trackService: TrackService) {}
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN, Role.ARTIST)
     @Post()
     @UseInterceptors(FileFieldsInterceptor([
@@ -42,7 +43,7 @@ export class TrackController {
         return this.trackService.getAll(limit, offset);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ARTIST, Role.ADMIN)
     @Delete(":id")
     delete(@Param("id") id: mongoose.Types.ObjectId, @Request() req) {
@@ -54,14 +55,14 @@ export class TrackController {
         return this.trackService.addComment(dto);
     }
 
-    @UseGuards(JwtAuthGuard, RolesGuard)
+    @UseGuards(RolesGuard)
     @Roles(Role.ADMIN)
     @Delete("/comments/:id")
     deleteComment(@Param("id") id: mongoose.Types.ObjectId, @Request() req) {
         return this.trackService.deleteComment(id, req.user.id);
     }
-
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(RolesGuard)
+    @Roles(Role.ADMIN, Role.ARTIST)
     @Post("/albums/:id")
     @UseInterceptors(FileFieldsInterceptor([
         { name: 'audio', maxCount: 1 },
@@ -73,7 +74,7 @@ export class TrackController {
     }
 
    @Post("/listen/:id") 
-   listen(@Param("id") id: mongoose.Types.ObjectId) {
-    return this.trackService.listen(id);
+   listen(@Param("id") id: mongoose.Types.ObjectId, @Req() req) {
+    return this.trackService.listen(id, req.user.id);
    }
 }

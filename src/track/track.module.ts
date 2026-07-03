@@ -6,13 +6,15 @@ import { Track, TrackSchema } from "./schemas/track.schema";
 import { Comment, CommentSchema } from "./schemas/comment.schema";
 import { FileModule } from "src/file/file.module";
 import { Album, AlbumSchema } from "src/album/schemas/album.schema";
+import { ActivityModule } from "src/activity/activity.module";
 
 @Module({
     imports: [
         MongooseModule.forFeature([{name: Track.name, schema: TrackSchema}]),
         MongooseModule.forFeature([{name: Comment.name, schema: CommentSchema}]),
         MongooseModule.forFeature([{name: Album.name, schema: AlbumSchema}]),
-        FileModule
+        FileModule,
+        ActivityModule,
     ],
     controllers: [TrackController],
     providers: [TrackService]
